@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Link, Outlet } from "react-router-dom";
 
 export default function Details() {
   const productId = "cm3ta1ihj0002fmf637p13mr8";
@@ -33,12 +34,15 @@ export default function Details() {
         </h2>
       </div>
       <div>
-        <button>reviews</button>
+        <Link to="reviews">
+          <button>reviews</button>
+        </Link>
         <div>
           <button>Update</button>
           <button>Delete</button>
         </div>
       </div>
+      <Outlet />
     </div>
   );
 }

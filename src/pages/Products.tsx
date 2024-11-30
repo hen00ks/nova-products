@@ -33,7 +33,7 @@ export default function Products() {
     },
   });
 
-  // console.log(productsObject);
+  // console.log(productsObject.data);
   // console.log(filters);
 
   const reacted = isLoading ? (
