@@ -10,7 +10,7 @@ export default function Products() {
     maxPrice: "",
     tags: [],
     page: 1,
-    pageSize: 10,
+    pageSize: 4,
     sortBy: "name",
     sortOrder: "asc",
   });
@@ -33,8 +33,8 @@ export default function Products() {
     },
   });
 
-  console.log(productsObject);
-  console.log(filters);
+  // console.log(productsObject);
+  // console.log(filters);
 
   const reacted = isLoading ? (
     <h1>Loading...</h1>
@@ -50,6 +50,10 @@ export default function Products() {
       );
     })
   );
+
+  const handlePageChange = (newPage) => {
+    setFilters((prev) => ({ ...prev, page: newPage }));
+  };
 
   return (
     <div>
@@ -137,6 +141,21 @@ export default function Products() {
         />
       </label>
       {reacted}
+      <div style={{ marginTop: "20px" }}>
+        <button
+          disabled={filters.page <= 1}
+          onClick={() => handlePageChange(filters.page - 1)}
+        >
+          Previous
+        </button>
+        <span style={{ margin: "0 10px" }}>Page {filters.page}</span>
+        <button
+          disabled={productsObject?.data?.length < filters.pageSize}
+          onClick={() => handlePageChange(filters.page + 1)}
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }
