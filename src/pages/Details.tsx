@@ -13,6 +13,7 @@ import { FaChevronRight } from "react-icons/fa6";
 import { Link, Outlet, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import { useDisclosure } from "@mantine/hooks";
+import ProductForm from "../components/ProductForm";
 
 export default function Details() {
   // const productId = "cm3ta1ihj0002fmf637p13mr8";
@@ -29,7 +30,6 @@ export default function Details() {
 
   //   console.log(data);
 
-  if (isLoading) return <h2>Loading...</h2>;
   const [
     deleteModalOpened,
     { open: openDeleteModal, close: closeDeleteModal },
@@ -38,6 +38,7 @@ export default function Details() {
     updateModalOpened,
     { open: openUpdateModal, close: closeUpdateModal },
   ] = useDisclosure(false);
+  if (isLoading) return <h2>Loading...</h2>;
 
   return (
     <div>
@@ -82,7 +83,7 @@ export default function Details() {
                     onClose={closeUpdateModal}
                     title="Update product"
                   >
-                    {/* <ProductForm /> */}
+                    <ProductForm updateProductData={data} />
                   </Modal>
                   <Button onClick={openUpdateModal}>Update</Button>
                 </div>

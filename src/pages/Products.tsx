@@ -28,6 +28,7 @@ import {
   FaChevronRight,
 } from "react-icons/fa6";
 import ProductCard from "../components/ProductCard";
+import ProductForm from "../components/ProductForm";
 
 export default function Products() {
   const [value, setValue] = useState("");
@@ -44,18 +45,6 @@ export default function Products() {
     sortOrder: "asc",
   });
   const [openFormModal, setOpenFormModal] = useState(false);
-
-  const inputRefs = {
-    productRef: useRef(null),
-    descriptionRef: useRef(null),
-    priceRef: useRef(null),
-    categoryRef: useRef(null),
-    imageRef: useRef(null),
-    quantityRef: useRef(null),
-    addedByRef: useRef(null),
-    productUseRef: useRef(null),
-    tagsRef: useRef(null),
-  };
 
   const {
     data: productsObject,
@@ -79,29 +68,8 @@ export default function Products() {
     },
   });
 
-  isFetched && console.log(productsObject.data);
+  // isFetched && console.log(productsObject.data);
   // console.log(filters);
-  const queryClient = useQueryClient();
-
-  const mutation = useMutation({
-    mutationKey: ["new-product"],
-    mutationFn: (formData) => {
-      return fetch("https://test-api.nova-techs.com/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      }).then((res) => res.json());
-    },
-    onSuccess: (data) => {
-      console.log("Product added successfully:", data);
-      queryClient.invalidateQueries(["products"]);
-    },
-    onError: (error) => {
-      console.error("Error submitting review:", error.message);
-    },
-  });
 
   const reacted = isLoading ? (
     <h1>Loading...</h1>
@@ -109,15 +77,17 @@ export default function Products() {
     isFetched &&
     productsObject?.data.map((product, i) => {
       return (
-        <ProductCard
-          key={product.id}
-          imageUrls={product.imageUrls}
-          productName={product.name}
-          price={product.price}
-          use={product.use}
-          description={product.description}
-          tags={product.tags}
-        />
+        <Link to={`/details/${product.id}`}>
+          <ProductCard
+            key={product.id}
+            imageUrls={product.imageUrls}
+            productName={product.name}
+            price={product.price}
+            use={product.use}
+            description={product.description}
+            tags={product.tags}
+          />
+        </Link>
       );
     })
   );
@@ -125,31 +95,6 @@ export default function Products() {
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, page: newPage }));
   };
-
-  function handleForm(e) {
-    e.preventDefault();
-    const formData = {
-      name: inputRefs.productRef.current?.value || "",
-      description: inputRefs.descriptionRef.current?.value || "",
-      price: parseFloat(inputRefs.priceRef.current?.value || 0),
-      sellingPrice: parseFloat(inputRefs.priceRef.current?.value || 0),
-      category: inputRefs.categoryRef.current?.value || "",
-      tags: inputRefs.tagsRef.current?.value.split(" ").filter((tag) => tag),
-      quantityOnHand: parseInt(inputRefs.quantityRef.current?.value || 1),
-      use: inputRefs.productUseRef.current?.value || "",
-      addedBy: inputRefs.addedByRef.current?.value || "",
-      imageUrls: inputRefs.imageRef.current?.value
-        ? [inputRefs.imageRef.current.value]
-        : [],
-      minimumQuantity: 1,
-      expiresAt: "2025-02-22T20:51:03.739Z",
-      reservedQuantity: 1,
-      discount: 1,
-    };
-
-    console.log(formData);
-    mutation.mutate(formData);
-  }
 
   const [opened, { open, close }] = useDisclosure(false);
   const marks = [
@@ -159,7 +104,7 @@ export default function Products() {
 
   return (
     <div>
-      <Header />
+      <Header page="Products" />
       <Button
         color="#25262b"
         size="sm"
@@ -169,63 +114,7 @@ export default function Products() {
         Add product
       </Button>
       <Modal opened={opened} onClose={close} title="Add product" centered>
-        <form onSubmit={handleForm}>
-          <Input.Wrapper label="Product name">
-            <Input ref={inputRefs.productRef} placeholder="eg: laptop" />
-          </Input.Wrapper>
-          <Input.Wrapper label="Description">
-            <Input
-              ref={inputRefs.descriptionRef}
-              placeholder="eg: 10th gen core i5"
-            />
-          </Input.Wrapper>
-          <Input.Wrapper label="Price">
-            <Input
-              ref={inputRefs.priceRef}
-              type="number"
-              placeholder="eg: 52,000"
-            />
-          </Input.Wrapper>
-          <Select
-            label="Category"
-            ref={inputRefs.categoryRef}
-            placeholder="Pick value"
-            data={[
-              { value: "clothing", label: "Clothing" },
-              { value: "furniture", label: "Furniture" },
-              { value: "electronics", label: "Electronics" },
-            ]}
-          />
-          <Input.Wrapper label="Tags">
-            <Input ref={inputRefs.tagsRef} placeholder="eg: new" />
-          </Input.Wrapper>
-          <Select
-            label="Use"
-            ref={inputRefs.productUseRef}
-            placeholder="Pick value"
-            data={[
-              { value: "for_sale", label: "For Sale" },
-              { value: "for_rent", label: "For Rent" },
-              { value: "for_use", label: "For Use" },
-            ]}
-          />
-          <Input.Wrapper label="Added by">
-            <Input ref={inputRefs.addedByRef} placeholder="eg: kaleb" />
-          </Input.Wrapper>
-          <Input.Wrapper label="Quantity on hand">
-            <Input
-              ref={inputRefs.quantityRef}
-              type="number"
-              placeholder="eg: 123"
-            />
-          </Input.Wrapper>
-          <Input.Wrapper label="Added by">
-            <Input ref={inputRefs.imageRef} placeholder="eg: add image URL" />
-          </Input.Wrapper>
-          <Button type="submit" fullWidth>
-            Add product
-          </Button>
-        </form>
+        <ProductForm />
       </Modal>
 
       <Input
@@ -287,21 +176,6 @@ export default function Products() {
           setFilters((prev) => ({ ...prev, sortBy: _value }))
         }
       />
-      {/* <Group>
-        <p>ascending</p>
-        <Switch
-          size="lg"
-          onLabel={<FaChevronDown />}
-          offLabel={<FaChevronUp />}
-          onChange={(e) =>
-            setFilters((prev) => ({
-              ...prev,
-              sortOrder: e.target.checked ? "desc" : "asc",
-            }))
-          }
-        />
-        <p>descending</p>
-      </Group> */}
       <SegmentedControl
         value={filters.sortOrder === "desc" ? "Descending" : "Ascending"}
         onChange={(e) =>
