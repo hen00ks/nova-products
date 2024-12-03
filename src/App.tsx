@@ -13,7 +13,7 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Products />} />
-          <Route path="/details" element={<Details />}>
+          <Route path="/details/:id" element={<Details />}>
             <Route path="reviews" element={<Reviews />} />
           </Route>
           <Route path="/new" element={<h1>Create new product page</h1>} />
