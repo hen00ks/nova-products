@@ -1,4 +1,4 @@
-import { Button, Input, NumberInput, Select } from "@mantine/core";
+import { Button, Input, NumberInput, Select, TagsInput } from "@mantine/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
@@ -11,7 +11,7 @@ const productSchema = z.object({
     .number({ invalid_type_error: "Price is required" })
     .min(0, "Price must be a positive number"),
   category: z.string().min(1, "Category is required"),
-  tags: z.string().optional(),
+  tags: z.array(z.string()).optional(),
   use: z.string().min(1, "Use is required"),
   addedBy: z.string().min(1, "Added by is required"),
   quantityOnHand: z.number().min(1, "Quantity must be at least 1"),
@@ -26,7 +26,7 @@ export default function ProductForm({ updateProductData: propsDefaultValues }) {
     name: "",
     description: "",
     category: "",
-    tags: "",
+    tags: [],
     use: "",
     addedBy: "",
     quantityOnHand: 1,
@@ -72,13 +72,15 @@ export default function ProductForm({ updateProductData: propsDefaultValues }) {
   const onSubmit = (data) => {
     const formData = {
       ...data,
-      tags: data.tags.split(" ").filter((tag) => tag),
+      tags: data.tags,
       imageUrls: data.imageUrls.length > 0 ? data.imageUrls : [], // Ensure imageUrls is always an array
       minimumQuantity: 1,
       expiresAt: "2025-02-22T20:51:03.739Z",
       reservedQuantity: 1,
       discount: 1,
     };
+
+    console.log(formData);
 
     mutation.mutate(formData);
   };
@@ -117,9 +119,21 @@ export default function ProductForm({ updateProductData: propsDefaultValues }) {
           />
         )}
       />
-      <Input.Wrapper label="Tags">
+      {/* <Input.Wrapper label="Tags">
         <Input {...register("tags")} placeholder="eg: new" />
-      </Input.Wrapper>
+      </Input.Wrapper> */}
+      <Controller
+        name="tags"
+        control={control}
+        render={({ field }) => (
+          <TagsInput
+            {...register("tags")}
+            {...field}
+            label="Tags"
+            placeholder="eg: new"
+          />
+        )}
+      />
       <Controller
         name="use"
         control={control}

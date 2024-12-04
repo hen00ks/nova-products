@@ -38,6 +38,7 @@ export default function Details() {
     updateModalOpened,
     { open: openUpdateModal, close: closeUpdateModal },
   ] = useDisclosure(false);
+
   if (isLoading) return <h2>Loading...</h2>;
 
   return (
