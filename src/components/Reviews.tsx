@@ -1,6 +1,5 @@
 import {
   Avatar,
-  Box,
   Button,
   Group,
   Input,
@@ -8,26 +7,35 @@ import {
   Rating,
   Stack,
   Textarea,
+  Notification,
 } from "@mantine/core";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { FaPen } from "react-icons/fa6";
-import { useParams } from "react-router-dom";
+import { useState } from "react";
+
+const reviewSchema = z.object({
+  reviewerName: z.string().nonempty("Name is required"),
+  comment: z.string().nonempty("Comment is required"),
+  rating: z
+    .number()
+    .min(1, "Rating must be at least 1")
+    .max(5, "Rating cannot exceed 5"),
+});
 
 export default function Reviews({ productId }) {
-  const nameRef = useRef();
-  const commentRef = useRef();
-  const ratingRef = useRef();
-  const [rating, setRating] = useState(0);
-
   const queryClient = useQueryClient();
+
+  const [notificationVisible, setNotificationVisible] = useState(false);
 
   const { data, isLoading } = useQuery({
     queryKey: ["reviews"],
     queryFn: () => {
-      return fetch(
-        `https://test-api.nova-techs.com/reviews/${productId} `
-      ).then((res) => res.json());
+      return fetch(`https://test-api.nova-techs.com/reviews/${productId}`).then(
+        (res) => res.json()
+      );
     },
   });
 
@@ -42,8 +50,8 @@ export default function Reviews({ productId }) {
         body: JSON.stringify(formData),
       }).then((res) => res.json());
     },
-    onSuccess: (data) => {
-      console.log("Review submitted successfully:", data);
+    onSuccess: () => {
+      setNotificationVisible(true);
       queryClient.invalidateQueries(["reviews"]);
     },
     onError: (error) => {
@@ -51,13 +59,29 @@ export default function Reviews({ productId }) {
     },
   });
 
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(reviewSchema),
+    defaultValues: {
+      reviewerName: "",
+      comment: "",
+      rating: 0,
+    },
+  });
+
+  const onSubmit = (data) => {
+    console.log(data);
+
+    mutation.mutate({ ...data, productId });
+    reset();
+  };
+
   if (isLoading) return <h2>Loading...</h2>;
-
-  console.log(data);
-
-  {
-    data?.length !== 0 ? <h3>{data.rating}</h3> : <h2>no reviews found</h2>;
-  }
 
   const reviews =
     data?.length !== 0 ? (
@@ -72,47 +96,59 @@ export default function Reviews({ productId }) {
         </Paper>
       ))
     ) : (
-      <h2>no reviews found</h2>
+      <h2>No reviews found</h2>
     );
-
-  function handleForm(e) {
-    e.preventDefault();
-    const formData = {
-      reviewerName: nameRef.current.value,
-      comment: commentRef.current.value,
-      rating: rating,
-      productId: productId,
-    };
-
-    // console.log(formData.rating);
-    mutation.mutate(formData);
-  }
 
   return (
     <>
-      <Stack mih={420} py="md" className="overflow-y-scroll">
+      <Stack h={420} py="md" className="overflow-y-scroll">
         {reviews}
       </Stack>
 
       <div>
-        <form onSubmit={handleForm}>
-          <h3>add your review here</h3>
-          <Input.Wrapper label="Name">
-            <Input ref={nameRef} placeholder="eg: Asrat Tunjo" />
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <h3>Add your review here</h3>
+          <Input.Wrapper label="Name" error={errors.reviewerName?.message}>
+            <Input
+              {...register("reviewerName")}
+              placeholder="e.g., Asrat Tunjo"
+            />
           </Input.Wrapper>
           <Textarea
             label="Comment"
-            placeholder="your comment here"
-            ref={commentRef}
+            placeholder="Your comment here"
+            {...register("comment")}
+            error={errors.comment?.message}
             autosize
             maxRows={3}
           />
-          <Group justify="space-around">
-            <Rating onChange={setRating} />
+          {notificationVisible && (
+            <Notification
+              title="Success"
+              color="green"
+              onClose={() => setNotificationVisible(false)}
+            >
+              Your review has been submitted!
+            </Notification>
+          )}
+          <Group justify="space-between" mt={8}>
+            <Controller
+              name="rating"
+              control={control}
+              render={({ field }) => (
+                <Rating
+                  size="lg"
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.rating?.message}
+                />
+              )}
+            />
             <Button type="submit" rightSection={<FaPen />} color="dark">
               Comment
             </Button>
           </Group>
+          <p className="text-xs text-red-400">{errors.rating?.message}</p>
         </form>
       </div>
     </>

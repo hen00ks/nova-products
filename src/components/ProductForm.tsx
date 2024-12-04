@@ -1,8 +1,17 @@
-import { Button, Input, NumberInput, Select, TagsInput } from "@mantine/core";
+import {
+  Button,
+  Input,
+  Select,
+  TagsInput,
+  Notification,
+  LoadingOverlay,
+} from "@mantine/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useDisclosure } from "@mantine/hooks";
 
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required"),
@@ -15,12 +24,15 @@ const productSchema = z.object({
   use: z.string().min(1, "Use is required"),
   addedBy: z.string().min(1, "Added by is required"),
   quantityOnHand: z.number().min(1, "Quantity must be at least 1"),
-  imageUrls: z.array(z.string().url("Must be a valid URL")).optional(),
+  imageUrls: z.string().url("Must be a valid URL").optional(),
 });
 
 export default function ProductForm({ updateProductData: propsDefaultValues }) {
   const isUpdating = !!propsDefaultValues;
   const queryClient = useQueryClient();
+  const [visible, { toggle }] = useDisclosure(false);
+
+  const [notificationVisible, setNotificationVisible] = useState(false);
 
   const defaultValues = propsDefaultValues || {
     name: "",
@@ -36,6 +48,7 @@ export default function ProductForm({ updateProductData: propsDefaultValues }) {
   const {
     register,
     handleSubmit,
+    reset,
     control,
     formState: { errors },
   } = useForm({
@@ -61,7 +74,8 @@ export default function ProductForm({ updateProductData: propsDefaultValues }) {
       }).then((res) => res.json());
     },
     onSuccess: () => {
-      console.log("Product added successfully");
+      toggle;
+      setNotificationVisible(true);
       queryClient.invalidateQueries(["products"]);
     },
     onError: (error) => {
@@ -73,16 +87,17 @@ export default function ProductForm({ updateProductData: propsDefaultValues }) {
     const formData = {
       ...data,
       tags: data.tags,
-      imageUrls: data.imageUrls.length > 0 ? data.imageUrls : [], // Ensure imageUrls is always an array
+      imageUrls: data.imageUrls.length > 0 ? data.imageUrls : [],
       minimumQuantity: 1,
       expiresAt: "2025-02-22T20:51:03.739Z",
       reservedQuantity: 1,
       discount: 1,
     };
-
+    toggle;
     // console.log(formData);
 
     mutation.mutate(formData);
+    reset();
   };
 
   return (
@@ -119,9 +134,7 @@ export default function ProductForm({ updateProductData: propsDefaultValues }) {
           />
         )}
       />
-      {/* <Input.Wrapper label="Tags">
-        <Input {...register("tags")} placeholder="eg: new" />
-      </Input.Wrapper> */}
+
       <Controller
         name="tags"
         control={control}
@@ -173,9 +186,24 @@ export default function ProductForm({ updateProductData: propsDefaultValues }) {
           placeholder="eg: image1.jpg, image2.jpg"
         />
       </Input.Wrapper>
+      {notificationVisible && (
+        <Notification
+          title="Success"
+          color="green"
+          onClose={() => setNotificationVisible(false)}
+        >
+          Your review has been submitted!
+        </Notification>
+      )}
       <Button type="submit" fullWidth className="mt-4">
         {isUpdating ? "Update product" : "Add product"}
       </Button>
+      <LoadingOverlay
+        visible={visible}
+        zIndex={1000}
+        overlayProps={{ radius: "sm", blur: 1 }}
+        loaderProps={{ color: "dark.7", type: "bars" }}
+      />
     </form>
   );
 }

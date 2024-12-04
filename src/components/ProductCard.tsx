@@ -1,12 +1,4 @@
-import {
-  ActionIcon,
-  Badge,
-  Button,
-  Card,
-  Group,
-  Image,
-  Text,
-} from "@mantine/core";
+import { Badge, Button, Card, Group, Image, Text } from "@mantine/core";
 import classes from "./ProductCard.module.css";
 
 export default function ProductCard(props) {
@@ -24,16 +16,15 @@ export default function ProductCard(props) {
   return (
     <Card
       shadow="md"
-      className="size-[422px]"
+      className="w-screen max-w-[422px] h-[422px] mx-auto"
       radius="md"
       p="md"
-      style={{ aspectRatio: "1" }}
     >
       <Card.Section className="h-40">
         <Image
           src={props.imageUrls[0]}
           alt={props.productName}
-          className="h-full object-contain"
+          className="h-full w-full object-contain"
         />
       </Card.Section>
 

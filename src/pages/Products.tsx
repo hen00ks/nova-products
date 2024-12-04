@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import {
   ActionIcon,
   Box,
@@ -45,6 +45,7 @@ export default function Products() {
     sortBy: "name",
     sortOrder: "asc",
   });
+  const isMobile = useMediaQuery("(max-width: 50em)");
 
   const {
     data: productsObject,
@@ -105,7 +106,7 @@ export default function Products() {
   return (
     <div>
       <Header page="Products" />
-      <Stack className="max-w-[1000px] mx-auto">
+      <Stack className="max-w-[1000px] mx-auto p-2">
         <Flex justify="end">
           <Button
             color="#25262b"
@@ -121,12 +122,14 @@ export default function Products() {
             title="Add product"
             centered
             size="xl"
+            fullScreen={isMobile}
           >
             <ProductForm updateProductData={null} />
           </Modal>
         </Flex>
         <Group justify="space-between" align="start">
           <Input
+            className="w-full"
             leftSection={<FaMagnifyingGlass size={16} />}
             placeholder="search for product"
             value={filters.search}
@@ -143,7 +146,7 @@ export default function Products() {
               />
             }
           />
-          <Stack>
+          <Stack className="w-full">
             <Select
               label="Filter by use"
               placeholder="Use"
@@ -175,7 +178,7 @@ export default function Products() {
               }
             />
           </Stack>
-          <Stack>
+          <Stack className="w-full">
             <Select
               label="Sort by:"
               data={[
@@ -188,17 +191,21 @@ export default function Products() {
                 setFilters((prev) => ({ ...prev, sortBy: _value }))
               }
             />
-            <SegmentedControl
-              value={filters.sortOrder === "desc" ? "Descending" : "Ascending"}
-              radius="xl"
-              onChange={(e) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  sortOrder: e === "Descending" ? "desc" : "asc",
-                }))
-              }
-              data={["Ascending", "Descending"]}
-            />
+            <div>
+              <SegmentedControl
+                value={
+                  filters.sortOrder === "desc" ? "Descending" : "Ascending"
+                }
+                radius="xl"
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    sortOrder: e === "Descending" ? "desc" : "asc",
+                  }))
+                }
+                data={["Ascending", "Descending"]}
+              />
+            </div>
           </Stack>
         </Group>
         <div>
@@ -206,9 +213,9 @@ export default function Products() {
             <div className="p-1 border-b-2">
               <h3 className="font-bold">Products</h3>
             </div>
-            <SimpleGrid cols={2} spacing="xl" verticalSpacing="xl" m="xl">
+            <div className="grid sm:grid-cols-2 place-items-center gap-y-12 my-12">
               {reacted}
-            </SimpleGrid>
+            </div>
           </div>
           <Flex justify={"center"}>
             <Group align="center">

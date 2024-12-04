@@ -5,7 +5,6 @@ import {
   Group,
   Button,
   Box,
-  Flex,
   Modal,
   Drawer,
   Badge,
@@ -14,9 +13,6 @@ import { useQuery } from "@tanstack/react-query";
 import {
   FaChevronRight,
   FaDatabase,
-  FaDeleteLeft,
-  FaPerson,
-  FaTrash,
   FaTrashCan,
   FaUser,
 } from "react-icons/fa6";
@@ -81,12 +77,16 @@ export default function Details() {
   return (
     <div>
       <Header page="Details" />
-      <Stack className="max-w-[1000px] mx-auto">
+      <Stack className="max-w-[1000px] mx-auto px-4">
         <Box>
-          {/* <img src={data.imageUrls[0]} alt="" /> */}
           <Group align="start" justify="space-between">
             <Group>
-              <Paper shadow="md" radius="md" p="md" className="size-[420px]">
+              <Paper
+                shadow="md"
+                radius="md"
+                p="md"
+                className="w-[min(420px,100vw)] aspect-square"
+              >
                 <Image
                   src={data.imageUrls[0]}
                   alt="product image"
@@ -162,7 +162,6 @@ export default function Details() {
                 onClose={closeDeleteModal}
                 title="Delete product"
               >
-                {/* Modal content */}
                 <h2>Are you sure?</h2>
                 <p>this action is irreversible</p>
                 <Group justify="end">
@@ -185,7 +184,10 @@ export default function Details() {
             </Group>
           </Group>
           <div className="mt-12">
-            <p>{data.description}</p>
+            <p>
+              <strong>Description: </strong>
+              {data.description}
+            </p>
           </div>
         </Box>
       </Stack>
