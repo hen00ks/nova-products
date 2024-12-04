@@ -14,12 +14,11 @@ import { useRef, useState } from "react";
 import { FaPen } from "react-icons/fa6";
 import { useParams } from "react-router-dom";
 
-export default function Reviews() {
-  const { id: productId } = useParams();
-
+export default function Reviews({ productId }) {
   const nameRef = useRef();
   const commentRef = useRef();
   const ratingRef = useRef();
+  const [rating, setRating] = useState(0);
 
   const queryClient = useQueryClient();
 
@@ -81,18 +80,17 @@ export default function Reviews() {
     const formData = {
       reviewerName: nameRef.current.value,
       comment: commentRef.current.value,
-      rating: parseInt(ratingRef.current.value),
+      rating: rating,
       productId: productId,
     };
 
-    console.log(formData);
+    // console.log(formData.rating);
     mutation.mutate(formData);
   }
 
   return (
-    <Paper shadow="md" withBorder w={"50%"} p="lg">
-      <h3>Reviews</h3>
-      <Stack mah={400} style={{ overflowY: "scroll" }}>
+    <>
+      <Stack mih={420} py="md" className="overflow-y-scroll">
         {reviews}
       </Stack>
 
@@ -110,13 +108,13 @@ export default function Reviews() {
             maxRows={3}
           />
           <Group justify="space-around">
-            <Rating ref={ratingRef} />
+            <Rating onChange={setRating} />
             <Button type="submit" rightSection={<FaPen />} color="dark">
               Comment
             </Button>
           </Group>
         </form>
       </div>
-    </Paper>
+    </>
   );
 }

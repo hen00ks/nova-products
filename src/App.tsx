@@ -5,7 +5,6 @@ import "@mantine/core/styles.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Products from "./pages/Products";
 import Details from "./pages/Details";
-import Reviews from "./pages/Reviews";
 
 export default function App() {
   return (
@@ -13,9 +12,7 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Products />} />
-          <Route path="/details/:id" element={<Details />}>
-            <Route path="reviews" element={<Reviews />} />
-          </Route>
+          <Route path="/details/:id" element={<Details />} />
           <Route path="/new" element={<h1>Create new product page</h1>} />
         </Routes>
       </Router>

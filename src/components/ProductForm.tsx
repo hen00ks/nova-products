@@ -80,13 +80,13 @@ export default function ProductForm({ updateProductData: propsDefaultValues }) {
       discount: 1,
     };
 
-    console.log(formData);
+    // console.log(formData);
 
     mutation.mutate(formData);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)} className="px-12">
       <Input.Wrapper label="Product name" error={errors.name?.message}>
         <Input {...register("name")} placeholder="eg: laptop" />
       </Input.Wrapper>
@@ -173,7 +173,7 @@ export default function ProductForm({ updateProductData: propsDefaultValues }) {
           placeholder="eg: image1.jpg, image2.jpg"
         />
       </Input.Wrapper>
-      <Button type="submit" fullWidth>
+      <Button type="submit" fullWidth className="mt-4">
         {isUpdating ? "Update product" : "Add product"}
       </Button>
     </form>

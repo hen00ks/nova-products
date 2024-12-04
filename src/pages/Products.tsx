@@ -17,6 +17,7 @@ import {
   SegmentedControl,
   Select,
   SimpleGrid,
+  Stack,
   Switch,
 } from "@mantine/core";
 import {
@@ -29,9 +30,9 @@ import {
 } from "react-icons/fa6";
 import ProductCard from "../components/ProductCard";
 import ProductForm from "../components/ProductForm";
+import Footer from "../components/Footer";
 
 export default function Products() {
-  const [value, setValue] = useState("");
   const [filters, setFilters] = useState({
     search: "",
     use: "",
@@ -44,7 +45,6 @@ export default function Products() {
     sortBy: "name",
     sortOrder: "asc",
   });
-  const [openFormModal, setOpenFormModal] = useState(false);
 
   const {
     data: productsObject,
@@ -105,116 +105,137 @@ export default function Products() {
   return (
     <div>
       <Header page="Products" />
-      <Button
-        color="#25262b"
-        size="sm"
-        leftSection={<FaPlus size={14} />}
-        onClick={open}
-      >
-        Add product
-      </Button>
-      <Modal opened={opened} onClose={close} title="Add product" centered>
-        <ProductForm />
-      </Modal>
-
-      <Input
-        leftSection={<FaMagnifyingGlass size={16} />}
-        placeholder="search for product"
-        value={filters.search}
-        onChange={(e) =>
-          setFilters((prev) => ({ ...prev, search: e.target.value }))
-        }
-        rightSectionPointerEvents="all"
-        mt="md"
-        rightSection={
-          <CloseButton
-            aria-label="Clear input"
-            onClick={() => setFilters((prev) => ({ ...prev, search: "" }))}
-            style={{ display: filters.search ? undefined : "none" }}
-          />
-        }
-      />
-      <Select
-        label="Filter by:"
-        placeholder="Use"
-        data={[
-          { value: "for_sale", label: "For Sale" },
-          { value: "for_rent", label: "For Rent" },
-          { value: "for_use", label: "For Use" },
-        ]}
-        value={filters.use}
-        onChange={(_value, option) =>
-          setFilters((prev) => ({ ...prev, use: _value }))
-        }
-        defaultValue=""
-        clearable
-      />
-      <RangeSlider
-        mx={"15%"}
-        defaultValue={[0, 1000]}
-        min={0}
-        max={1000}
-        step={10}
-        marks={marks}
-        onChangeEnd={(val) =>
-          setFilters((prev) => ({
-            ...prev,
-            minPrice: parseInt(val[0]),
-            maxPrice: parseInt(val[1]),
-          }))
-        }
-      />
-      <Select
-        label="Sort by:"
-        data={[
-          { value: "name", label: "Product name" },
-          { value: "price", label: "Price" },
-          { value: "createdAt", label: "Time listed" },
-        ]}
-        value={filters.sortBy}
-        onChange={(_value, option) =>
-          setFilters((prev) => ({ ...prev, sortBy: _value }))
-        }
-      />
-      <SegmentedControl
-        value={filters.sortOrder === "desc" ? "Descending" : "Ascending"}
-        onChange={(e) =>
-          setFilters((prev) => ({
-            ...prev,
-            sortOrder: e === "Descending" ? "desc" : "asc",
-          }))
-        }
-        data={["Ascending", "Descending"]}
-      />
-      <div>
-        <SimpleGrid cols={2} spacing="xl" verticalSpacing="xl" m="xl">
-          {reacted}
-        </SimpleGrid>
-
-        <Flex justify={"center"}>
-          <Group align="center">
-            <ActionIcon
-              variant="default"
-              size="lg"
-              disabled={filters.page <= 1}
-              onClick={() => handlePageChange(filters.page - 1)}
-              aria-label="previous page"
-            >
-              <FaChevronLeft />
-            </ActionIcon>
-            <span style={{ margin: "0 10px" }}>Page {filters.page}</span>
-            <ActionIcon
-              variant="default"
-              size="lg"
-              disabled={productsObject?.data?.length < filters.pageSize}
-              onClick={() => handlePageChange(filters.page + 1)}
-              aria-label="previous page"
-            >
-              <FaChevronRight />
-            </ActionIcon>
-          </Group>
+      <Stack className="max-w-[1000px] mx-auto">
+        <Flex justify="end">
+          <Button
+            color="#25262b"
+            size="sm"
+            leftSection={<FaPlus size={14} />}
+            onClick={open}
+          >
+            Add product
+          </Button>
+          <Modal
+            opened={opened}
+            onClose={close}
+            title="Add product"
+            centered
+            size="xl"
+          >
+            <ProductForm updateProductData={null} />
+          </Modal>
         </Flex>
-      </div>
+        <Group justify="space-between" align="start">
+          <Input
+            leftSection={<FaMagnifyingGlass size={16} />}
+            placeholder="search for product"
+            value={filters.search}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, search: e.target.value }))
+            }
+            rightSectionPointerEvents="all"
+            mt="md"
+            rightSection={
+              <CloseButton
+                aria-label="Clear input"
+                onClick={() => setFilters((prev) => ({ ...prev, search: "" }))}
+                style={{ display: filters.search ? undefined : "none" }}
+              />
+            }
+          />
+          <Stack>
+            <Select
+              label="Filter by use"
+              placeholder="Use"
+              data={[
+                { value: "for_sale", label: "For Sale" },
+                { value: "for_rent", label: "For Rent" },
+                { value: "for_use", label: "For Use" },
+              ]}
+              value={filters.use}
+              onChange={(_value, option) =>
+                setFilters((prev) => ({ ...prev, use: _value }))
+              }
+              defaultValue=""
+              clearable
+            />
+            <RangeSlider
+              mx={"15%"}
+              defaultValue={[0, 1000]}
+              min={0}
+              max={1000}
+              step={10}
+              marks={marks}
+              onChangeEnd={(val) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  minPrice: parseInt(val[0]),
+                  maxPrice: parseInt(val[1]),
+                }))
+              }
+            />
+          </Stack>
+          <Stack>
+            <Select
+              label="Sort by:"
+              data={[
+                { value: "name", label: "Product name" },
+                { value: "price", label: "Price" },
+                { value: "createdAt", label: "Time listed" },
+              ]}
+              value={filters.sortBy}
+              onChange={(_value, option) =>
+                setFilters((prev) => ({ ...prev, sortBy: _value }))
+              }
+            />
+            <SegmentedControl
+              value={filters.sortOrder === "desc" ? "Descending" : "Ascending"}
+              radius="xl"
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  sortOrder: e === "Descending" ? "desc" : "asc",
+                }))
+              }
+              data={["Ascending", "Descending"]}
+            />
+          </Stack>
+        </Group>
+        <div>
+          <div>
+            <div className="p-1 border-b-2">
+              <h3 className="font-bold">Products</h3>
+            </div>
+            <SimpleGrid cols={2} spacing="xl" verticalSpacing="xl" m="xl">
+              {reacted}
+            </SimpleGrid>
+          </div>
+          <Flex justify={"center"}>
+            <Group align="center">
+              <ActionIcon
+                variant="default"
+                size="lg"
+                disabled={filters.page <= 1}
+                onClick={() => handlePageChange(filters.page - 1)}
+                aria-label="previous page"
+              >
+                <FaChevronLeft />
+              </ActionIcon>
+              <span style={{ margin: "0 10px" }}>Page {filters.page}</span>
+              <ActionIcon
+                variant="default"
+                size="lg"
+                disabled={productsObject?.data?.length < filters.pageSize}
+                onClick={() => handlePageChange(filters.page + 1)}
+                aria-label="previous page"
+              >
+                <FaChevronRight />
+              </ActionIcon>
+            </Group>
+          </Flex>
+        </div>
+      </Stack>
+      <Footer />
     </div>
   );
 }
