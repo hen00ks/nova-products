@@ -1,36 +1,26 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
-import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import {
   ActionIcon,
-  Box,
-  Button,
   CloseButton,
   Flex,
   Group,
   Input,
-  Modal,
-  Radio,
   RangeSlider,
   SegmentedControl,
   Select,
-  SimpleGrid,
   Stack,
-  Switch,
 } from "@mantine/core";
 import {
-  FaPlus,
   FaMagnifyingGlass,
-  FaChevronDown,
-  FaChevronUp,
   FaChevronLeft,
   FaChevronRight,
 } from "react-icons/fa6";
 import ProductCard from "../components/ProductCard";
-import ProductForm from "../components/ProductForm";
 import Footer from "../components/Footer";
+import AddorUpdateModal, { actionTypes } from "../components/AddorUpdateModal";
 
 export default function Products() {
   const [filters, setFilters] = useState({
@@ -45,7 +35,6 @@ export default function Products() {
     sortBy: "name",
     sortOrder: "asc",
   });
-  const isMobile = useMediaQuery("(max-width: 50em)");
 
   const {
     data: productsObject,
@@ -97,7 +86,6 @@ export default function Products() {
     setFilters((prev) => ({ ...prev, page: newPage }));
   };
 
-  const [opened, { open, close }] = useDisclosure(false);
   const marks = [
     { value: 0, label: "min" },
     { value: 1000, label: "max(1000 ETB)" },
@@ -108,24 +96,7 @@ export default function Products() {
       <Header page="Products" />
       <Stack className="max-w-[1000px] mx-auto p-2">
         <Flex justify="end">
-          <Button
-            color="#25262b"
-            size="sm"
-            leftSection={<FaPlus size={14} />}
-            onClick={open}
-          >
-            Add product
-          </Button>
-          <Modal
-            opened={opened}
-            onClose={close}
-            title="Add product"
-            centered
-            size="xl"
-            fullScreen={isMobile}
-          >
-            <ProductForm updateProductData={null} />
-          </Modal>
+          <AddorUpdateModal action={actionTypes.Add} updateProductData={null} />
         </Flex>
         <Group justify="space-between" align="start">
           <Input

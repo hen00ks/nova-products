@@ -29,6 +29,8 @@ const productSchema = z.object({
 
 export default function ProductForm({ updateProductData: propsDefaultValues }) {
   const isUpdating = !!propsDefaultValues;
+  console.log(isUpdating);
+
   const queryClient = useQueryClient();
   const [visible, { toggle }] = useDisclosure(false);
 
@@ -76,7 +78,7 @@ export default function ProductForm({ updateProductData: propsDefaultValues }) {
     onSuccess: () => {
       toggle;
       setNotificationVisible(true);
-      queryClient.invalidateQueries(["products"]);
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     },
     onError: (error) => {
       console.error("Error submitting review:", error.message);

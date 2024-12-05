@@ -16,16 +16,16 @@ import {
   FaTrashCan,
   FaUser,
 } from "react-icons/fa6";
-import { Link, Outlet, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import { useDisclosure } from "@mantine/hooks";
-import ProductForm from "../components/ProductForm";
-import Footer from "../components/Footer";
 import Reviews from "../components/Reviews";
+import AddorUpdateModal, { actionTypes } from "../components/AddorUpdateModal";
+import DeleteModal from "../components/DeleteModal";
 
 export default function Details() {
   // const productId = "cm3ta1ihj0002fmf637p13mr8";
-  const { id: productId } = useParams();
+  const { productId } = useParams();
 
   const { data, isLoading } = useQuery({
     queryKey: ["productid"],
@@ -38,14 +38,6 @@ export default function Details() {
 
   //   console.log(data);
   const [opened, { open, close }] = useDisclosure(false);
-  const [
-    deleteModalOpened,
-    { open: openDeleteModal, close: closeDeleteModal },
-  ] = useDisclosure(false);
-  const [
-    updateModalOpened,
-    { open: openUpdateModal, close: closeUpdateModal },
-  ] = useDisclosure(false);
 
   if (isLoading) return <h2>Loading...</h2>;
 
@@ -142,45 +134,11 @@ export default function Details() {
               </Stack>
             </Group>
             <Group>
-              <Modal
-                opened={updateModalOpened}
-                onClose={closeUpdateModal}
-                title="Update product"
-                size="xl"
-              >
-                <ProductForm updateProductData={data} />
-              </Modal>
-              <Button
-                onClick={openUpdateModal}
-                color="dark.7"
-                leftSection={<FaDatabase />}
-              >
-                Update product
-              </Button>
-              <Modal
-                opened={deleteModalOpened}
-                onClose={closeDeleteModal}
-                title="Delete product"
-              >
-                <h2>Are you sure?</h2>
-                <p>this action is irreversible</p>
-                <Group justify="end">
-                  <Button variant="light" color="red">
-                    Delete
-                  </Button>
-                  <Button variant="default" onClick={closeDeleteModal}>
-                    Cancel
-                  </Button>
-                </Group>
-              </Modal>
-              <Button
-                onClick={openDeleteModal}
-                variant="filled"
-                color="red"
-                leftSection={<FaTrashCan />}
-              >
-                Delete
-              </Button>
+              <AddorUpdateModal
+                action={actionTypes.Update}
+                updateProductData={data}
+              />
+              <DeleteModal productId={productId as string} />
             </Group>
           </Group>
           <div className="mt-12">

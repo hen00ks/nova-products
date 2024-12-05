@@ -10,8 +10,7 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Products />} />
-          <Route path="/details/:id" element={<Details />} />
-          <Route path="/new" element={<h1>Create new product page</h1>} />
+          <Route path="/details/:productId" element={<Details />} />
         </Routes>
       </Router>
     </MantineProvider>
